@@ -1,6 +1,9 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper.Internal;
+using AutoMapper.QueryableExtensions.Impl;
+using System.Linq.Expressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,12 +11,13 @@ builder.Services.AddDbContext<ReproDbContext>(ctx => ctx.UseSqlServer("Server=(l
 
 var config = new MapperConfiguration(cfg =>
 {
-    cfg.CreateMap<ParentModel, ParentDto>().ForMember(p => p.Children, p => p.MapFrom(x => x.Children));
-    cfg.CreateMap<ChildModel, ChildDto>().IncludeAllDerived();
+    cfg.Internal().ProjectionMappers.Insert(0, new InheritanceMapper<ChildModel, ChildDto>());
+    cfg.CreateProjection<ParentModel, ParentDto>().ForMember(p => p.Children, p => p.MapFrom(x => x.Children));
+    cfg.CreateProjection<ChildModel, ChildDto>();
 
 
-    cfg.CreateMap<ChildModelA, ChildDtoA>();
-    cfg.CreateMap<ChildModelB, ChildDtoB>();
+    //cfg.CreateMap<ChildModelA, ChildDtoA>();
+    //cfg.CreateMap<ChildModelB, ChildDtoB>();
 });
 
 var app = builder.Build();
@@ -39,24 +43,37 @@ if (parent == null)
     ctx.SaveChanges();
 }
 
-{
-    var typeA = typeof(ChildModelA);
-    var typeB = typeof(ChildModelB);
-    var projection = ctx.Parents.Include(p => p.Children).Select(p => new ParentDto()
-    { 
-        Id = p.Id,
-        Children = p.Children.Select(c => c.GetType() == typeA ? new ChildDtoA() { Id = ((ChildModelA)c).Id, A = ((ChildModelA)c).A } :
-            c.GetType() == typeB ? new ChildDtoB() { Id = ((ChildModelB)c).Id, B = ((ChildModelB)c).B } :
-            new ChildDto() { Id = c.Id }).ToList()
-    });
-    var query = projection.ToQueryString();
-    var result = projection.ToList();
-}
+//{
+//    var typeA = typeof(ChildModelA);
+//    var typeB = typeof(ChildModelB);
+//    var projection = ctx.Parents.Include(p => p.Children).Select(p => new ParentDto()
+//    { 
+//        Id = p.Id,
+//        Children = p.Children.Select(c => c.GetType() == typeA ? new ChildDtoA() { Id = ((ChildModelA)c).Id, A = ((ChildModelA)c).A } :
+//            c.GetType() == typeB ? new ChildDtoB() { Id = ((ChildModelB)c).Id, B = ((ChildModelB)c).B } :
+//            new ChildDto() { Id = c.Id }).ToList()
+//    });
+//    var query = projection.ToQueryString();
+//    var result = projection.ToList();
+//}
 
 {
     var projection = ctx.Parents.ProjectTo<ParentDto>(config);
     var query = projection.ToQueryString();
     var result = projection.ToList();
+}
+
+public class InheritanceMapper<TBaseSource,TBaseDest> : IProjectionMapper
+{
+    public bool IsMatch(TypePair context)
+    {
+        return context.SourceType == typeof(TBaseSource) && context.DestinationType == typeof(TBaseDest);
+    }
+
+    public Expression Project(IGlobalConfiguration configuration, in ProjectionRequest request, Expression resolvedSource, LetPropertyMaps letPropertyMaps)
+    {
+        return resolvedSource;
+    }
 }
 
 public class ReproDbContext : DbContext
