@@ -40,7 +40,15 @@ if (parent == null)
 }
 
 {
-    var projection = ctx.Parents.Include(p => p.Children);
+    var typeA = typeof(ChildModelA);
+    var typeB = typeof(ChildModelB);
+    var projection = ctx.Parents.Include(p => p.Children).Select(p => new ParentDto()
+    { 
+        Id = p.Id,
+        Children = p.Children.Select(c => c.GetType() == typeA ? new ChildDtoA() { Id = ((ChildModelA)c).Id, A = ((ChildModelA)c).A } :
+            c.GetType() == typeB ? new ChildDtoB() { Id = ((ChildModelB)c).Id, B = ((ChildModelB)c).B } :
+            new ChildDto() { Id = c.Id }).ToList()
+    });
     var query = projection.ToQueryString();
     var result = projection.ToList();
 }
