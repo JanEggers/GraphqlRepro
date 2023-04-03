@@ -39,12 +39,17 @@ if (parent == null)
     ctx.SaveChanges();
 }
 
+{
+    var projection = ctx.Parents.Include(p => p.Children);
+    var query = projection.ToQueryString();
+    var result = projection.ToList();
+}
 
-var projection = ctx.Parents.ProjectTo<ParentDto>(config);
-var query = projection.ToQueryString();
-var result = projection.ToList();
-
-result.ToString();
+{
+    var projection = ctx.Parents.ProjectTo<ParentDto>(config);
+    var query = projection.ToQueryString();
+    var result = projection.ToList();
+}
 
 public class ReproDbContext : DbContext
 {
