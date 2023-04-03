@@ -1,5 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using HotChocolate;
+using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 
@@ -10,7 +12,9 @@ builder.Services.AddDbContext<ReproDbContext>(ctx => ctx.UseSqlServer("Server=(l
 builder.Services.AddSingleton<AutoMapper.IConfigurationProvider>(c => new MapperConfiguration(cfg =>
 {
     cfg.CreateMap<ParentModel, ParentDto>().ForMember(p => p.Children, p => p.MapFrom(x => x.Children));
-    cfg.CreateMap<ChildModel, ChildDto>();
+    cfg.CreateMap<ChildModel, ChildDto>().IncludeAllDerived();
+
+
     cfg.CreateMap<ChildModelA, ChildDtoA>();
     cfg.CreateMap<ChildModelB, ChildDtoB>();
 }));
