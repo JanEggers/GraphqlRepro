@@ -1,3 +1,6 @@
 [submodule "graphql-platform"]
 	path = graphql-platform
 	url = https://github.com/ChilliCream/graphql-platform.git
+[submodule "AutoMapper"]
+	path = AutoMapper
+	url = https://github.com/JanEggers/AutoMapper
