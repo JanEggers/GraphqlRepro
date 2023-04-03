@@ -63,6 +63,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.Types.Filters"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.Types.Sorting", "graphql-platform\src\HotChocolate\Filters\src\Types.Sorting\HotChocolate.Types.Sorting.csproj", "{F312CBA1-BC6E-4E8C-923C-9B7A52F30E3F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoMapper", "AutoMapper\src\AutoMapper\AutoMapper.csproj", "{CCF88DF9-CE64-4038-8E9E-DF8FF5540949}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -189,6 +191,10 @@ Global
 		{F312CBA1-BC6E-4E8C-923C-9B7A52F30E3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F312CBA1-BC6E-4E8C-923C-9B7A52F30E3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F312CBA1-BC6E-4E8C-923C-9B7A52F30E3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCF88DF9-CE64-4038-8E9E-DF8FF5540949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF88DF9-CE64-4038-8E9E-DF8FF5540949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCF88DF9-CE64-4038-8E9E-DF8FF5540949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCF88DF9-CE64-4038-8E9E-DF8FF5540949}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

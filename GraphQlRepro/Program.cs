@@ -1,15 +1,12 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HotChocolate;
-using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ReproDbContext>(ctx => ctx.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=GraphQlRepro;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
-builder.Services.AddSingleton<AutoMapper.IConfigurationProvider>(c => new MapperConfiguration(cfg =>
+var config = new MapperConfiguration(cfg =>
 {
     cfg.CreateMap<ParentModel, ParentDto>().ForMember(p => p.Children, p => p.MapFrom(x => x.Children));
     cfg.CreateMap<ChildModel, ChildDto>().IncludeAllDerived();
@@ -17,22 +14,7 @@ builder.Services.AddSingleton<AutoMapper.IConfigurationProvider>(c => new Mapper
 
     cfg.CreateMap<ChildModelA, ChildDtoA>();
     cfg.CreateMap<ChildModelB, ChildDtoB>();
-}));
-
-builder.Services.AddControllers();
-
-builder.Services.AddGraphQLServer()
-    .RegisterDbContext<ReproDbContext>()
-    .AddProjections()
-    .AddFiltering()
-    .AddSorting()
-    .AddInterfaceType<ChildModel>()
-    .AddType<ChildModelA>()
-    .AddType<ChildModelB>()
-    .AddInterfaceType<ChildDto>()
-    .AddType<ChildDtoA>()
-    .AddType<ChildDtoB>()
-    .AddQueryType<Query>();
+});
 
 var app = builder.Build();
 
@@ -57,40 +39,12 @@ if (parent == null)
     ctx.SaveChanges();
 }
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-}
-app.UseStaticFiles();
 
-app.UseRouting();
+var projection = ctx.Parents.ProjectTo<ParentDto>(config);
+var query = projection.ToQueryString();
+var result = projection.ToList();
 
-app.UseEndpoints(endpoints => endpoints.MapGraphQL());
-
-//app.MapGraphQL();
-
-app.Run();
-
-public class Query
-{
-    [UseProjection]
-    [UseFiltering]
-    [UseSorting]
-    public IQueryable<ParentModel> GetParents(ReproDbContext ctx)
-    {
-        return ctx.Parents;
-    }
-
-    [UseProjection]
-    [UseFiltering]
-    [UseSorting]
-    public IQueryable<ParentDto> GetParentDtos([Service] ReproDbContext ctx, [Service] AutoMapper.IConfigurationProvider autoMapperConfig)
-    {
-        var result = ctx.Parents.ProjectTo<ParentDto>(autoMapperConfig).ToList();
-        return result.AsQueryable();
-    }
-}
+result.ToString();
 
 public class ReproDbContext : DbContext
 {
