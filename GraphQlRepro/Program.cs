@@ -11,8 +11,10 @@ builder.Services.AddDbContext<ReproDbContext>(ctx => ctx.UseSqlServer("Server=(l
 
 builder.Services.AddSingleton<AutoMapper.IConfigurationProvider>(c => new MapperConfiguration(cfg =>
 {
-    cfg.CreateMap<ParentModel, ParentDto>().ForMember(p => p.Children, p => p.MapFrom(x => x.Children));
-    cfg.CreateMap<ChildModel, ChildDto>().IncludeAllDerived();
+    cfg.CreateMap<ParentModel, ParentDto>();
+    cfg.CreateMap<ChildModel, ChildDto>()
+        .Include<ChildModelA, ChildDtoA>()
+        .Include<ChildModelB, ChildDtoB>();
 
 
     cfg.CreateMap<ChildModelA, ChildDtoA>();
